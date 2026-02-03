@@ -261,6 +261,8 @@ export type PageFeedbackToolbarCSSProps = {
   onCopy?: (markdown: string) => void;
   /** Whether to copy to clipboard when the copy button is clicked. Defaults to true. */
   copyToClipboard?: boolean;
+  /** Pre-load annotations on mount. These are merged with any annotations already in localStorage. */
+  initialAnnotations?: Annotation[];
 };
 
 /** Alias for PageFeedbackToolbarCSSProps */
@@ -280,6 +282,7 @@ export function PageFeedbackToolbarCSS({
   onAnnotationsClear,
   onCopy,
   copyToClipboard = true,
+  initialAnnotations,
 }: PageFeedbackToolbarCSSProps = {}) {
   const [isActive, setIsActive] = useState(false);
   const [annotations, setAnnotations] = useState<Annotation[]>([]);
@@ -424,7 +427,17 @@ export function PageFeedbackToolbarCSS({
     setMounted(true);
     setScrollY(window.scrollY);
     const stored = loadAnnotations<Annotation>(pathname);
-    setAnnotations(stored);
+    if (initialAnnotations && initialAnnotations.length > 0) {
+      // Merge: use initialAnnotations but skip any whose id already exists in stored
+      const storedIds = new Set(stored.map((a) => a.id));
+      const merged = [
+        ...stored,
+        ...initialAnnotations.filter((a) => !storedIds.has(a.id)),
+      ];
+      setAnnotations(merged);
+    } else {
+      setAnnotations(stored);
+    }
 
     // Trigger entrance animation only on first load (not on SPA navigation)
     if (!hasPlayedEntranceAnimation) {
