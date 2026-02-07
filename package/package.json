@@ -24,6 +24,7 @@
   ],
   "scripts": {
     "build": "tsup",
+    "build:bookmarklet": "tsup && node scripts/build-bookmarklet.mjs",
     "watch": "tsup --watch",
     "dev": "pnpm build && pnpm watch",
     "test": "vitest run",

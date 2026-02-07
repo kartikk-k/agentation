@@ -100,4 +100,26 @@ export default defineConfig((options) => [
       js: '"use client";',
     },
   },
+  // Standalone bundle (React bundled internally, IIFE format)
+  {
+    entry: ["src/standalone.ts"],
+    format: ["iife"],
+    globalName: "Agentation",
+    outExtension() {
+      return { js: ".js" };
+    },
+    dts: false,
+    splitting: false,
+    sourcemap: false,
+    clean: false,
+    minify: true,
+    esbuildPlugins: [scssModulesPlugin()],
+    define: {
+      __VERSION__: JSON.stringify(VERSION),
+      "process.env.NODE_ENV": JSON.stringify("production"),
+    },
+    esbuildOptions(options) {
+      options.legalComments = "none";
+    },
+  },
 ]);
